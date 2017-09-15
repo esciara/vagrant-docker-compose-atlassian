@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "2028"
   end
-  
+
   config.vm.provision "shell", inline: <<-SHELL
     #############################################
     # Installing docker
@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
     sudo apt-key fingerprint 0EBFCD88
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     sudo apt-get update
-    sudo apt-get install docker-ce
+    sudo apt-get install -y docker-ce
     # Solving permission denied pb. 
     # See https://techoverflow.net/2017/03/01/solving-docker-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/
     sudo usermod -a -G docker $USER 
