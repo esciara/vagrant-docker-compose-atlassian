@@ -58,4 +58,3 @@ docker-atlassian-confluence
 docker-atlassian-jira-software
 atlassian-docker-compose
 docker-atlassian-confluence-server-official
-poc-docker-compose-atlassian
