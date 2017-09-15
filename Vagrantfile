@@ -20,66 +20,78 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "2028"
   end
-
-  config.vm.provision "docker" do |d|
-    d.run "cptactionhank/atlassian-jira-software:7.4.0",
-      args: "--name jira-software --publish 8080:8080"
-    # using 'latest' because of decrepancies in announced Confluence Home location on specific versions in doc at
-    # https://cptactionhank.github.io/docker-atlassian-confluence/
-    d.run "cptactionhank/atlassian-confluence:latest",
-      args: "--name confluence --publish 8090:8090"
-    d.run "postgres:9.3",
-      args: "--name postgres-9-3"
-  end
-
+  
   config.vm.provision "shell", inline: <<-SHELL
-    sleep 5
-    docker exec postgres-9-3 psql --username postgres --command "create database jiradb owner postgres encoding 'utf8';"
-    docker exec postgres-9-3 psql --username postgres --command "create database confluencedb  owner postgres encoding 'utf8';"
-  SHELL
+    #############################################
+    # Installing docker
+    #############################################
+    # See https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-using-the-repository
+    sudo apt-get update
+    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo apt-key fingerprint 0EBFCD88
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    sudo apt-get install docker-ce
+    # Solving permission denied pb. 
+    # See https://techoverflow.net/2017/03/01/solving-docker-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/
+    sudo usermod -a -G docker $USER 
 
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   # Following instructions in http://misheska.com/blog/2013/12/26/set-up-a-sane-ruby-cookbook-authoring-environment-for-chef/#linux
-  #   sudo apt-get update
-  #   sudo apt-get install -y build-essential git
-  #   sudo apt-get install -y libxml2-dev libxslt-dev libssl-dev
-  #   wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
-  #   tar -xzvf chruby-0.3.9.tar.gz
-  #   cd chruby-0.3.9/
-  #   sudo make install
-  #   cd ..
-  #   # rm chruby-0.3.8.tar.gz
-  #   # rm -rf chruby-0.3.8
-  #   git clone https://github.com/sstephenson/ruby-build.git
-  #   cd ruby-build/
-  #   sudo ./install.sh
-  #   cd ..
-  #   # rm -rf ruby-build
-  #   echo 'source /usr/local/share/chruby/chruby.sh' >> $HOME/.bashrc
-  #   echo 'source /usr/local/share/chruby/auto.sh' >> $HOME/.bashrc
-  #   source ~/.bashrc
-  #   ruby-build 2.2.3 --install-dir ~/.rubies/ruby-2.2.3
-  #   source $HOME/.bashrc
-  #   chruby ruby-2.2.3
-  #   echo 'chruby ruby-2.2.3' >> $HOME/.bashrc
-  #   gem update --system
-  #   gem install bundler
-  #
-  #   # Following instructions in https://gist.github.com/julionc/7476620
-  #   sudo apt-get update
-  #   sudo apt-get install -y build-essential chrpath libssl-dev libxft-dev
-  #   sudo apt-get install -y libfreetype6 libfreetype6-dev
-  #   sudo apt-get install -y libfontconfig1 libfontconfig1-dev
-  #   export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64"
-  #   wget https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOM_JS.tar.bz2
-  #   sudo tar xvjf $PHANTOM_JS.tar.bz2
-  #   sudo mv $PHANTOM_JS /usr/local/share
-  #   sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
-  #
-  #   # Launching the tests
-  #   git clone https://github.com/cptactionhank/docker-atlassian-confluence.git
-  #   cd docker-atlassian-confluence/
-  #   bundler
-  #   bundle exec rake
-  # SHELL
+    #############################################
+    # Installing docker-compose
+    #############################################
+    # See https://docs.docker.com/compose/install/#install-using-pip
+    sudo apt-get install -y python-pip
+    pip install --upgrade pip
+    sudo pip install docker-compose
+
+    #############################################
+    # Installing ruby
+    #############################################
+    # Following instructions in http://misheska.com/blog/2013/12/26/set-up-a-sane-ruby-cookbook-authoring-environment-for-chef/#linux
+    sudo apt-get update
+    sudo apt-get install -y build-essential git
+    sudo apt-get install -y libxml2-dev libxslt-dev libssl-dev
+    wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
+    tar -xzvf chruby-0.3.9.tar.gz
+    cd chruby-0.3.9/
+    sudo make install
+    cd ..
+    # rm chruby-0.3.8.tar.gz
+    # rm -rf chruby-0.3.8
+    git clone https://github.com/sstephenson/ruby-build.git
+    cd ruby-build/
+    sudo ./install.sh
+    cd ..
+    # rm -rf ruby-build
+    echo 'source /usr/local/share/chruby/chruby.sh' >> /home/vagrant/.bashrc
+    echo 'source /usr/local/share/chruby/auto.sh' >> /home/vagrant/.bashrc
+    source /home/vagrant/.bashrc
+    ruby-build 2.2.3 --install-dir /home/vagrant/.rubies/ruby-2.2.3
+    source /home/vagrant/.bashrc
+    chruby ruby-2.2.3
+    echo 'chruby ruby-2.2.3' >> /home/vagrant.bashrc
+    gem update --system
+    gem install bundler
+
+    #############################################
+    # Installing PhantomJS
+    #############################################
+    # Following instructions in https://gist.github.com/julionc/7476620
+    sudo apt-get update
+    sudo apt-get install -y build-essential chrpath libssl-dev libxft-dev
+    sudo apt-get install -y libfreetype6 libfreetype6-dev
+    sudo apt-get install -y libfontconfig1 libfontconfig1-dev
+    export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64"
+    wget https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOM_JS.tar.bz2
+    sudo tar xvjf $PHANTOM_JS.tar.bz2
+    sudo mv $PHANTOM_JS /usr/local/share
+    sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
+
+    # # Launching the tests
+    # git clone https://github.com/cptactionhank/docker-atlassian-confluence.git
+    # cd docker-atlassian-confluence/
+    # bundler
+    # bundle exec rake
+  SHELL
 end
