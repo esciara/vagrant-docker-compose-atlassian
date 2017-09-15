@@ -6,6 +6,6 @@
 [subrepo]
 	remote = https://github.com/esciara/poc-docker-compose-atlassian.git
 	branch = master
-	commit = b6fd989732a6bcd28b09f1eb444c4526d8a27d27
-	parent = 01956494100a32e95c6b9c046dd305a8e2b8914a
+	commit = 9959a27c57c57391dbf2731cdcf9d7b90906c325
+	parent = e0cce1197351b44c7531bcf6efdc25605aaa6cc8
 	cmdver = 0.3.1
