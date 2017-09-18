@@ -52,9 +52,3 @@ website/www/.sass-cache
 website/www/build
 website/www/Rakefile
 exec/
-
-# imported repos
-docker-atlassian-confluence
-docker-atlassian-jira-software
-atlassian-docker-compose
-docker-atlassian-confluence-server-official
