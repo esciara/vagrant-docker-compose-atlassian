@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/cptactionhank/docker-atlassian-confluence.git
+	branch = master
+	commit = 2cf7d9b197f4bfda8c89598b0d6a50bd0f4319df
+	parent = 6cb7e0b259c97a86b64a3b0c817eae1b3ca46717
+	cmdver = 0.3.1
