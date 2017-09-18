@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/cptactionhank/docker-atlassian-jira-software.git
+	branch = master
+	commit = 693e7b600504cc30fbadc06a66c54a60028dbfac
+	parent = 26c3cc0fd8c17a775daf96390d52140f856733bb
+	cmdver = 0.3.1
